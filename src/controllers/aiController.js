@@ -1,5 +1,8 @@
 import { supabase } from "../config/supabaseClient.js";
 import { logActivity } from "../utils/activityLogger.js";
+import { model } from "../config/geminiClient.js";
+import { cleanJsonResponse } from "../utils/jsonCleaner.js";
+
 
 export const analyzeSubmission = async (req, res) => {
   try {
@@ -20,55 +23,78 @@ export const analyzeSubmission = async (req, res) => {
     if (submissionError || !submission) {
       return res.status(404).json({ message: "Submission not found" });
     }
+const { data: existingReview } = await supabase
+  .from("review_results")
+  .select("id")
+  .eq("submission_id", submission_id)
+  .maybeSingle();
 
-    // ----------------------------
-    // LLM INTEGRATION PLACEHOLDER
-    // ----------------------------
+const { data: existingOptimization } = await supabase
+  .from("optimization_results")
+  .select("id")
+  .eq("submission_id", submission_id)
+  .maybeSingle();
 
-    const dummyReview = {
-      issues_found: [
-        { type: "warning", message: "Use meaningful variable names." },
-        { type: "suggestion", message: "Avoid nested loops if possible." }
-      ],
-      suggestions: [
-        "Use const/let properly.",
-        "Reduce repeated computations."
-      ],
-      complexity_analysis: {
-        time: "O(n^2)",
-        space: "O(1)"
-      },
-      score: 0.75
-    };
+if (existingReview || existingOptimization) {
+  return res.status(400).json({
+    message: "AI analysis already generated for this submission"
+  });
+}
 
-    const dummyOptimization = {
-      optimized_code:
-        "// Optimized version placeholder\n" +
-        submission.code_input +
-        "\n// TODO: Replace with actual AI optimized output",
-      improvements_summary: "Refactored code structure and improved readability.",
-      performance_gain: {
-        before: "O(n^2)",
-        after: "O(n log n)"
-      }
-    };
+    const prompt = `
+You are CodeRefine AI.
 
-    const dummyRawOutput = {
-      review: dummyReview,
-      optimization: dummyOptimization,
-      notes: "This is a dummy AI output. Replace with real LLM integration."
-    };
+Analyze the following ${submission.language} code.
+
+Tasks:
+1. Detect bugs and bad practices
+2. Suggest improvements
+3. Give time and space complexity
+4. Rewrite optimized version of code
+5. Provide short explanation
+
+Return output strictly in JSON format like:
+{
+  "issues_found": [],
+  "suggestions": [],
+  "complexity_analysis": { "time": "", "space": "" },
+  "optimized_code": "",
+  "improvements_summary": "",
+  "confidence_score": 0.0
+}
+IMPORTANT:
+Return ONLY JSON.
+Do not add markdown.
+Do not add explanation outside JSON.
+
+Code:
+${submission.code_input}
+`;
+
+    const result = await model.generateContent(prompt);
+    const responseText = cleanJsonResponse(result.response.text());
+
+    let aiOutput;
+
+    try {
+      aiOutput = JSON.parse(responseText);
+    } catch (err) {
+      return res.status(500).json({
+        message: "AI returned invalid JSON format",
+        raw_output: responseText
+      });
+    }
 
     // Insert review results
     const { data: reviewData, error: reviewError } = await supabase
       .from("review_results")
       .insert([
         {
-          submission_id: submission_id,
-          issues_found: dummyReview.issues_found,
-          suggestions: dummyReview.suggestions,
-          complexity_analysis: dummyReview.complexity_analysis,
-          score: dummyReview.score
+          submission_id,
+          issues_found: aiOutput.issues_found,
+          suggestions: aiOutput.suggestions,
+          complexity_analysis: aiOutput.complexity_analysis,
+          score: aiOutput.confidence_score
         }
       ])
       .select();
@@ -82,10 +108,10 @@ export const analyzeSubmission = async (req, res) => {
       .from("optimization_results")
       .insert([
         {
-          submission_id: submission_id,
-          optimized_code: dummyOptimization.optimized_code,
-          improvements_summary: dummyOptimization.improvements_summary,
-          performance_gain: dummyOptimization.performance_gain
+          submission_id,
+          optimized_code: aiOutput.optimized_code,
+          improvements_summary: aiOutput.improvements_summary,
+          performance_gain: aiOutput.complexity_analysis
         }
       ])
       .select();
@@ -99,11 +125,11 @@ export const analyzeSubmission = async (req, res) => {
       .from("ai_review_logs")
       .insert([
         {
-          submission_id: submission_id,
-          model_name: "dummy-model-v1",
+          submission_id,
+          model_name: "gemini-1.5-flash",
           prompt_version: "v1",
-          raw_output: dummyRawOutput,
-          confidence_score: 0.80
+          raw_output: aiOutput,
+          confidence_score: aiOutput.confidence_score
         }
       ])
       .select();
@@ -118,7 +144,7 @@ export const analyzeSubmission = async (req, res) => {
     });
 
     res.json({
-      message: "AI analysis generated successfully (dummy output)",
+      message: "AI analysis generated successfully",
       submission,
       review: reviewData[0],
       optimization: optimizationData[0],
