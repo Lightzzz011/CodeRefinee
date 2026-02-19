@@ -1,4 +1,4 @@
-# CodeRefine 🚀  
+# CodeRefine   
 ### Generative AI–Powered Code Review & Optimization Engine
 
 CodeRefine is a full-stack application that helps developers and students improve their code quality using **Generative AI**.  
@@ -61,3 +61,147 @@ Each user has their own isolated data access using Supabase RLS policies.
 1. User signs up / logs in using Supabase Auth  
 2. Frontend receives a JWT access token  
 3. Token is sent in backend API requests as:
+
+Authorization: Bearer <token>
+
+4. Backend verifies token using Supabase
+5. Code submission is stored in PostgreSQL
+6. Backend sends code to Gemini LLM for analysis
+7. AI output is stored in database:
+- review results
+- optimized code
+- AI logs
+8. User can view complete history anytime
+
+---
+
+## 📂 Project Folder Structure
+
+
+
+coderefine-backend/
+│── src/
+│ ├── config/
+│ │ ├── supabaseClient.js
+│ │ └── geminiClient.js
+│ ├── controllers/
+│ │ ├── aiController.js
+│ │ ├── dashboardController.js
+│ │ ├── historyController.js
+│ │ ├── projectController.js
+│ │ └── submissionController.js
+│ ├── middleware/
+│ │ └── authMiddleware.js
+│ ├── routes/
+│ │ ├── aiRoutes.js
+│ │ ├── dashboardRoutes.js
+│ │ ├── historyRoutes.js
+│ │ ├── projectRoutes.js
+│ │ └── submissionRoutes.js
+│ ├── utils/
+│ │ ├── activityLogger.js
+│ │ └── jsonCleaner.js
+│ └── server.js
+│── package.json
+│── package-lock.json
+│── .env (ignored)
+
+
+---
+
+## 🔗 API Endpoints
+
+### Projects
+- `POST /api/projects/create`
+- `GET /api/projects`
+
+### Submissions
+- `POST /api/submissions/create`
+- `GET /api/submissions`
+- `GET /api/submissions/:id`
+- `DELETE /api/submissions/:id`
+
+### AI Analysis
+- `POST /api/ai/analyze`
+
+### History
+- `GET /api/history`
+
+### Dashboard
+- `GET /api/dashboard/stats`
+
+---
+
+## 🚀 Setup & Installation (Backend)
+
+### 1️⃣ Clone Repository
+```bash
+git clone https://github.com/Lightzzz011/CodeRefinee.git
+
+cd coderefine-backend
+
+2️⃣ Install Dependencies :
+
+npm install
+
+3️⃣ Setup Environment Variables
+
+Create a .env file in the backend root:
+
+PORT=5000
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+GEMINI_API_KEY=your_gemini_api_key
+
+
+⚠️ Never expose your .env file publicly.
+
+4️⃣ Run Backend Server
+npm run dev
+
+
+Backend runs on:
+
+http://localhost:5000
+
+🔐 Authentication (Supabase Auth)
+
+All backend endpoints are protected using Supabase JWT token.
+
+Frontend must send token in every request:
+
+Authorization: Bearer <access_token>
+
+🤖 AI Integration
+
+Gemini LLM is used for:
+
+Code Review
+
+Bug Detection
+
+Optimization Suggestions
+
+Complexity Analysis
+
+Optimized Code Generation
+
+The AI output is stored in PostgreSQL for history tracking and audit purposes.
+
+📌 Future Enhancements
+
+Code plagiarism detection
+
+Multi-language syntax highlighting
+
+PDF report export
+
+Admin analytics dashboard
+
+Code execution sandbox (safe runtime)
+
+👨‍💻 Authors
+
+Sai (Backend + Database)
+
+Team Member (Frontend)
