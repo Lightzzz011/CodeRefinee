@@ -10,16 +10,16 @@ This project is built using **Node.js + Express** for backend, **Supabase Postgr
 
 ## 🔥 Key Features
 
-✅ Supabase Authentication (Secure Login/Signup)  
-✅ Submit code for review and optimization  
-✅ AI-generated bug detection and best practices suggestions  
-✅ Time & Space Complexity Analysis  
-✅ AI-generated optimized code output  
-✅ User Project Management (Organize submissions into projects)  
-✅ Submission History Tracking  
-✅ AI Trace Logs stored for transparency  
-✅ Dashboard Stats (Total submissions, projects, most used language)  
-✅ Secure Database with Row Level Security (RLS)
+1. Supabase Authentication (Secure Login/Signup)  
+2. Submit code for review and optimization  
+3. AI-generated bug detection and best practices suggestions  
+4. Time & Space Complexity Analysis  
+5. AI-generated optimized code output  
+6. User Project Management (Organize submissions into projects)  
+7. Submission History Tracking  
+8. AI Trace Logs stored for transparency  
+9. Dashboard Stats (Total submissions, projects, most used language)  
+10. Secure Database with Row Level Security (RLS)
 
 ---
 
@@ -131,77 +131,3 @@ coderefine-backend/
 - `GET /api/dashboard/stats`
 
 ---
-
-## 🚀 Setup & Installation (Backend)
-
-### 1️⃣ Clone Repository
-
-git clone https://github.com/Lightzzz011/CodeRefinee.git
-
-cd coderefine-backend
-
-2️⃣ Install Dependencies :
-
-npm install
-
-3️⃣ Setup Environment Variables
-
-Create a .env file in the backend root:
-
-PORT=5000
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-GEMINI_API_KEY=your_gemini_api_key
-
-
-⚠️ Never expose your .env file publicly.
-
-4️⃣ Run Backend Server
-npm run dev
-
-
-Backend runs on:
-
-http://localhost:5000
-
-🔐 Authentication (Supabase Auth)
-
-All backend endpoints are protected using Supabase JWT token.
-
-Frontend must send token in every request:
-
-Authorization: Bearer <access_token>
-
-🤖 AI Integration
-
-Gemini LLM is used for:
-
-Code Review
-
-Bug Detection
-
-Optimization Suggestions
-
-Complexity Analysis
-
-Optimized Code Generation
-
-The AI output is stored in PostgreSQL for history tracking and audit purposes.
-
-📌 Future Enhancements
-
-Code plagiarism detection
-
-Multi-language syntax highlighting
-
-PDF report export
-
-Admin analytics dashboard
-
-Code execution sandbox (safe runtime)
-
-👨‍💻 Authors
-
-Sai (Backend + Database)
-
-Team Member (Frontend)
