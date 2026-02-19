@@ -3,7 +3,8 @@ import { protect } from "../middleware/authMiddleware.js";
 import {
   createSubmission,
   getAllSubmissions,
-  getSubmissionById
+  getSubmissionById,
+  deleteSubmission
 } from "../controllers/submissionController.js";
 
 const router = express.Router();
@@ -11,5 +12,6 @@ const router = express.Router();
 router.post("/create", protect, createSubmission);
 router.get("/", protect, getAllSubmissions);
 router.get("/:id", protect, getSubmissionById);
+router.delete("/:id", protect, deleteSubmission);
 
 export default router;

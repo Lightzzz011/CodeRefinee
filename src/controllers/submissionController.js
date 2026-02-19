@@ -100,3 +100,31 @@ export const getSubmissionById = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+export const deleteSubmission = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { data: submission, error: findError } = await supabase
+      .from("code_submissions")
+      .select("*")
+      .eq("id", id)
+      .eq("user_id", req.user.id)
+      .single();
+
+    if (findError || !submission) {
+      return res.status(404).json({ message: "Submission not found" });
+    }
+    const { error: deleteError } = await supabase
+      .from("code_submissions")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", req.user.id);
+
+    if (deleteError) {
+      return res.status(400).json({ message: deleteError.message });
+    }
+
+    res.json({ message: "Submission deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
