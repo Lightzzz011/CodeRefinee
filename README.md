@@ -110,6 +110,11 @@ coderefine-backend/
 
 ---
 
+## 📸 Database Schema
+
+![Database Schema](screenshots/screenshot.png)
+
+
 ## 🔗 API Endpoints
 
 ### Projects
