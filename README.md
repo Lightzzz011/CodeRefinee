@@ -1,4 +1,4 @@
-# CodeRefine 
+# CodeRefine 🚀
 ### Generative AI–Powered Code Review & Optimization Engine
 
 CodeRefine is a full-stack application that helps developers and students improve their code quality using **Generative AI**.  
