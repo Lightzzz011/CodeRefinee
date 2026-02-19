@@ -1,4 +1,5 @@
 import { supabase } from "../config/supabaseClient.js";
+import { logActivity } from "../utils/activityLogger.js";
 
 export const createProject = async (req, res) => {
   try {
@@ -23,7 +24,12 @@ export const createProject = async (req, res) => {
       return res.status(400).json({ message: error.message });
     }
 
-    res.status(201).json({ message: "Project created successfully", project: data[0] });
+    await logActivity(req.user.id, "create_project", { title });
+
+    res.status(201).json({
+      message: "Project created successfully",
+      project: data[0]
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
@@ -40,6 +46,8 @@ export const getProjects = async (req, res) => {
     if (error) {
       return res.status(400).json({ message: error.message });
     }
+
+    await logActivity(req.user.id, "view_projects");
 
     res.json({ projects: data });
   } catch (err) {

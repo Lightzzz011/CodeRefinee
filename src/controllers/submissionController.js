@@ -1,4 +1,5 @@
 import { supabase } from "../config/supabaseClient.js";
+import { logActivity } from "../utils/activityLogger.js";
 
 export const createSubmission = async (req, res) => {
   try {
@@ -27,6 +28,11 @@ export const createSubmission = async (req, res) => {
       return res.status(400).json({ message: error.message });
     }
 
+    await logActivity(req.user.id, "submit_code", {
+      language,
+      submission_type
+    });
+
     res.status(201).json({
       message: "Code submission stored successfully",
       submission: data[0]
@@ -47,6 +53,8 @@ export const getAllSubmissions = async (req, res) => {
     if (error) {
       return res.status(400).json({ message: error.message });
     }
+
+    await logActivity(req.user.id, "view_submissions");
 
     res.json({ submissions: data });
   } catch (err) {
@@ -80,6 +88,8 @@ export const getSubmissionById = async (req, res) => {
       .select("*")
       .eq("submission_id", id)
       .single();
+
+    await logActivity(req.user.id, "view_submission_detail", { submission_id: id });
 
     res.json({
       submission,
